@@ -167,3 +167,18 @@ You're now ready to [start using Git LFS](https://github.com/git-lfs/git-lfs#exa
       git fetch --all
       git lfs migrate import --everything --above=25MiB
       git push --all --force-with-lease
+
+# Limitations
+
+### DigitalOcean/Linode `service=s3` parameter
+
+The `aws4fetch` library we use currently incorrectly guesses the `service` parameter for [DigitalOcean Spaces](https://github.com/mhart/aws4fetch/issues/15) or [Linode Object Storage](https://github.com/twilligon/git-lfs-s3-proxy/issues/10), which causes signatures to be computed with the wrong value for that parameter, which causes signature verification to fail, which causes authentication to fail, which causes `git-lfs-s3-proxy` to [fail](https://github.com/twilligon/git-lfs-s3-proxy/issues/10) as if your credentials are incorrect.
+
+Hopefully `aws4fetch` merges the [fix](https://github.com/mhart/aws4fetch/pull/79) and this becomes unnecessary. Until then, if you encounter this issue, explicitly set `service=s3` to the path in your instance URL after the hostname but before the endpoint:
+
+    https://<ACCESS_KEY_ID>:<SECRET_ACCESS_KEY>@<INSTANCE>/service=s3/<ENDPOINT>/<BUCKET>
+
+For example, with a Linode bucket `my-repo` in `us-east-1` region with access key ID `foo` and secret access key `bar` via the default instance:
+
+    https://foo:bar@git-lfs-s3-proxy.pages.dev/service=s3/us-east-1.linodeobjects.com/my-repo
+
