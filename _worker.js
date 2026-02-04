@@ -40,6 +40,23 @@ function parseAuthorization(req) {
   return { user: decoded.slice(0, index), pass: decoded.slice(index + 1) };
 }
 
+function getAwsCredentials(req, env) {
+  if (env.USE_CLOUDFLARE_CREDS === "true") {
+    if (!env.AWS_ACCESS_KEY_ID || !env.AWS_SECRET_ACCESS_KEY) {
+      throw new Response("Missing Cloudflare AWS credentials", { status: 500 });
+    }
+
+    return {
+      accessKeyId: env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+      sessionToken: env.AWS_SESSION_TOKEN,
+    };
+  }
+
+  const { user, pass } = parseAuthorization(req);
+  return { accessKeyId: user, secretAccessKey: pass };
+}
+
 async function fetch(req, env) {
   const url = new URL(req.url);
 
@@ -65,8 +82,7 @@ async function fetch(req, env) {
     return new Response(null, { status: 406 });
   }*/
 
-  const { user, pass } = parseAuthorization(req);
-  let s3Options = { accessKeyId: user, secretAccessKey: pass };
+  let s3Options = getAwsCredentials(req, env);
 
   const segments = url.pathname.split("/").slice(1, -2);
   let params = {};
