@@ -76,11 +76,6 @@ async function fetch(req, env) {
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
   }
 
-  // in practice, we'd rather not break out-of-spec clients not setting these
-  /*if (!req.headers.get("Accept").startsWith(MIME)
-    || !req.headers.get("Content-Type").startsWith(MIME)) {
-    return new Response(null, { status: 406 });
-  }*/
 
   let s3Options = getAwsCredentials(req, env);
 
