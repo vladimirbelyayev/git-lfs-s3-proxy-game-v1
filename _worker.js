@@ -2,8 +2,6 @@ import { AwsClient } from "aws4fetch";
 
 const EXPIRY = 3600;
 
-const MIME = "application/vnd.git-lfs+json";
-
 const METHOD_FOR = {
   upload: "PUT",
   download: "GET",
