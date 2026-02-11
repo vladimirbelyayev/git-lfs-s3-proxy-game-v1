@@ -1,6 +1,5 @@
 import { AwsClient } from "aws4fetch";
 
-const HOMEPAGE = "https://github.com/milkey-mouse/git-lfs-s3-proxy";
 const EXPIRY = 3600;
 
 const MIME = "application/vnd.git-lfs+json";
@@ -59,14 +58,6 @@ function getAwsCredentials(req, env) {
 
 async function fetch(req, env) {
   const url = new URL(req.url);
-
-  if (url.pathname == "/") {
-    if (req.method === "GET") {
-      return Response.redirect(HOMEPAGE, 302);
-    } else {
-      return new Response(null, { status: 405, headers: { Allow: "GET" } });
-    }
-  }
 
   if (!url.pathname.endsWith("/objects/batch")) {
     return new Response(null, { status: 404 });
